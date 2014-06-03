@@ -85,6 +85,47 @@ static struct attribute * calc_attributes[] = {
 };
 
 
+static ssize_t default_show(struct kobject *kobj, struct attribute *attr,
+		char *buf)
+{
+	if (!strcmp(attr->name, RESULT)) {
+		long res = calculate();
+
+		return sprintf(buf, "%ld\n", res);
+	} else {
+		return 0;
+	}
+}
+
+static ssize_t default_store(struct kobject *kobj, struct attribute *attr,
+		const char *buf, size_t len)
+{
+	if(len > WRITE_SIZE) {
+		len = WRITE_SIZE;
+	}
+
+	if (!strcmp(attr->name, ARG1)) {
+		memcpy(arg1_input, buf, len);
+	} else if (!strcmp(attr->name, ARG2)) {
+		memcpy(arg2_input, buf, len);
+	} else if (!strcmp(attr->name, OPERATION)) {
+		memcpy(operation_input, buf, len);
+	}
+	return len;
+}
+
+static struct sysfs_ops calc_ops = {
+	.show = default_show,
+	.store = default_store,
+};
+
+static struct kobj_type calc_type = {
+	.sysfs_ops = &calc_ops,
+	.default_attrs = calc_attributes,
+};
+
+struct kobject *calc_obj;
+
 struct proc_dir_entry *calc_dir;
 struct proc_dir_entry *arg1;
 struct proc_dir_entry *arg2;

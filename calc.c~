@@ -54,6 +54,35 @@ long calculate(void) {
 	return res;
 }
 
+#ifdef SYSFS
+
+static struct attribute arg1 = {
+	.name = ARG1,
+	.mode = 0666,
+};
+
+static struct attribute arg2 = {
+	.name = ARG2,
+	.mode = 0666,
+};
+
+static struct attribute operation = {
+	.name = OPERATION,
+	.mode = 0666,
+};
+
+static struct attribute result = {
+	.name = RESULT,
+	.mode = 0666,
+};
+
+static struct attribute * calc_attributes[] = {
+	&arg1,
+	&arg2,
+	&operation,
+	&result,
+	NULL
+};
 
 
 struct proc_dir_entry *calc_dir;
