@@ -125,6 +125,37 @@ static struct kobj_type calc_type = {
 };
 
 struct kobject *calc_obj;
+static int __init sysfsexample_module_init(void)
+{
+	int err = -1;
+	calc_obj = kzalloc(sizeof(*calc_obj), GFP_KERNEL);
+	if (calc_obj) {
+		kobject_init(calc_obj, &calc_type);
+		if (kobject_add(calc_obj, NULL, "%s", PARENT_DIR)) {
+			 err = -1;
+			 printk("Sysfs creation failed\n");
+			 kobject_put(calc_obj);
+			 calc_obj = NULL;
+		}
+		err = 0;
+	}
+	return err;
+}
+
+static void __exit sysfsexample_module_exit(void)
+{
+	if (calc_obj) {
+		kobject_put(calc_obj);
+		kfree(calc_obj);
+	}
+}
+
+module_init(sysfsexample_module_init);
+module_exit(sysfsexample_module_exit);
+MODULE_LICENSE("GPL");
+
+
+#else
 
 struct proc_dir_entry *calc_dir;
 struct proc_dir_entry *arg1;
@@ -236,4 +267,4 @@ void cleanup_module()
 	printk(KERN_INFO "/proc/%s removed\n", PARENT_DIR);
 }
 
-
+#endif
